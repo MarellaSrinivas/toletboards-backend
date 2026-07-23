@@ -13,6 +13,16 @@ public interface PropertyRepository
     List<Property> findByOwner(User owner);
         List<Property> findByApprovedTrue();
 
+ 
+
+    long countByOwner(User owner);
+
+    long countByOwnerAndActiveTrue(User owner);
+
+    long countByOwnerAndApprovedFalse(User owner);
+
+    long countByOwnerAndApprovedTrue(User owner);
+
     
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.toletboards.dto.DashboardResponse;
 import com.toletboards.dto.PropertyRequest;
 import com.toletboards.dto.PropertyResponse;
 
@@ -26,6 +27,8 @@ public interface PropertyService {
 
     List<PropertyResponse> getAllProperties();
 
+
+    DashboardResponse getDashboard(UserDetails userDetails);
  
 
 }

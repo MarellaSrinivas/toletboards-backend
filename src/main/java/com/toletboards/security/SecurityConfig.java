@@ -56,6 +56,9 @@ public class SecurityConfig {
 
     .requestMatchers("/api/user/**").hasAnyRole("USER", "AGENT", "ADMIN")
 
+    .requestMatchers("/api/visits/**")
+.hasAnyRole("USER","AGENT","ADMIN")
+
     .anyRequest().authenticated()
 )
 
