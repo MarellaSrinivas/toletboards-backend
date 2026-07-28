@@ -17,7 +17,6 @@ import com.toletboards.repository.UserRepository;
 import com.toletboards.security.JwtService;
 import com.toletboards.service.AuthService;
 import com.toletboards.service.RefreshTokenService;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import lombok.RequiredArgsConstructor;
 

@@ -7,6 +7,7 @@ import com.toletboards.dto.PropertyRequest;
 import com.toletboards.dto.PropertyResponse;
 import com.toletboards.dto.UploadedImage;
 import com.toletboards.model.Property;
+import com.toletboards.model.PropertyApprovalStatus;
 import com.toletboards.model.PropertyImage;
 import com.toletboards.model.User;
 import com.toletboards.repository.PropertyImageRepository;
@@ -15,7 +16,7 @@ import com.toletboards.repository.PropertyVisitRepository;
 import com.toletboards.repository.UserRepository;
 import com.toletboards.service.PropertyImageService;
 import com.toletboards.service.PropertyService;
-
+import com.toletboards.model.PropertyApprovalStatus;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -134,7 +135,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional(readOnly = true)
     public List<PropertyResponse> getAllProperties() {
 
-        return propertyRepository.findByApprovedTrue()
+        return propertyRepository.findByApprovalStatus(PropertyApprovalStatus.APPROVED)
+
 
                 .stream()
 
@@ -250,8 +252,7 @@ public class PropertyServiceImpl implements PropertyService {
                 .coverImage(coverImage)
                 .imageUrls(imageUrls)
 
-                .approved(property.getApproved())
-
+                .approvalStatus(property.getApprovalStatus())
                 .build();
     }
 
@@ -273,11 +274,15 @@ public DashboardResponse getDashboard(UserDetails userDetails) {
             .activeProperties(
                     propertyRepository.countByOwnerAndActiveTrue(owner))
 
-            .pendingApproval(
-                    propertyRepository.countByOwnerAndApprovedFalse(owner))
+           .pendingApproval(
+        propertyRepository.countByOwnerAndApprovalStatus(
+                owner,
+                PropertyApprovalStatus.PENDING))
 
-            .approvedProperties(
-                    propertyRepository.countByOwnerAndApprovedTrue(owner))
+.approvedProperties(
+        propertyRepository.countByOwnerAndApprovalStatus(
+                owner,
+                PropertyApprovalStatus.APPROVED))
 
             .totalVisits(
                     PropertyVisitRepository.countByOwnerId(owner.getId()))

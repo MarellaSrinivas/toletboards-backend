@@ -5,6 +5,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.toletboards.model.PropertyApprovalStatus;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -63,5 +65,6 @@ public class PropertyResponse {
     private String coverImage;
     private List<String> imageUrls;
 
-    private Boolean approved;
+ private Boolean active;
+ private PropertyApprovalStatus approvalStatus;
 }

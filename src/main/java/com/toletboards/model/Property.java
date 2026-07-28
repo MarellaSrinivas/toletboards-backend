@@ -114,8 +114,9 @@ public class Property {
      * Status
      */
 
-    @Builder.Default
-    private Boolean approved=false;
+ @Enumerated(EnumType.STRING)
+@Builder.Default
+private PropertyApprovalStatus approvalStatus = PropertyApprovalStatus.PENDING;
 
     @Builder.Default
     private Boolean active=true;

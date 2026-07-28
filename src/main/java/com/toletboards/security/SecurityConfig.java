@@ -46,6 +46,9 @@ public class SecurityConfig {
 
         .requestMatchers("/uploads/**").permitAll()
 
+         .requestMatchers("/api/admin/**")
+        .hasRole("ADMIN")
+
 
     // Public property APIs
     .requestMatchers(HttpMethod.GET, "/api/properties/**").permitAll()

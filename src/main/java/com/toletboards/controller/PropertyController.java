@@ -7,9 +7,6 @@ import com.toletboards.dto.DashboardResponse;
 import com.toletboards.dto.PropertyRequest;
 import com.toletboards.dto.PropertyResponse;
 import com.toletboards.service.PropertyService;
-import org.springframework.security.core.Authentication;
-
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
