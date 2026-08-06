@@ -2,15 +2,13 @@ package com.toletboards.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.toletboards.model.Property;
-import com.toletboards.model.User;
-
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable; 
 import com.toletboards.model.PropertyApprovalStatus;
+import com.toletboards.model.User;
 
 
 public interface PropertyRepository
@@ -77,5 +75,7 @@ Page<Property> findByActiveTrue(Pageable pageable);
 long countByActiveTrue();
 
 long countByActiveFalse();
+
+void deleteByOwner(User owner);
 
 }

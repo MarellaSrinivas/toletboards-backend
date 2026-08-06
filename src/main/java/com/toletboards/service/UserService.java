@@ -19,4 +19,7 @@ public interface UserService {
             MultipartFile image,
             UserDetails userDetails);
 
+
+            void deleteAccount(UserDetails userDetails);
+
 }

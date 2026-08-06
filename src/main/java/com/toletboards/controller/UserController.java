@@ -75,4 +75,18 @@ public class UserController {
 
     }
 
+
+    @DeleteMapping("/profile")
+public ResponseEntity<?> deleteAccount(
+        @AuthenticationPrincipal UserDetails userDetails) {
+
+    userService.deleteAccount(userDetails);
+
+    return ResponseEntity.ok(
+            java.util.Map.of(
+                    "message",
+                    "Account deleted successfully"
+            )
+    );
+}
 }
