@@ -7,10 +7,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.toletboards.dto.AuthResponse;
+import com.toletboards.dto.GoogleLoginRequest;
+import com.toletboards.dto.GoogleLoginResponse;
 import com.toletboards.dto.LoginRequest;
 import com.toletboards.dto.RefreshTokenRequest;
 import com.toletboards.dto.RegisterRequest;
 import com.toletboards.service.AuthService;
+import com.toletboards.service.GoogleAuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import lombok.RequiredArgsConstructor;
  public class AuthController {
 
     private final AuthService authService;
+
+     private final GoogleAuthService googleAuthService;
 
     /**
      * Register User / Agent
@@ -66,6 +71,31 @@ import lombok.RequiredArgsConstructor;
         authService.logout(authentication.getName());
 
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+@PostMapping("/google")
+    public ResponseEntity<GoogleLoginResponse> googleLogin(
+            @Valid @RequestBody GoogleLoginRequest request) {
+
+        return ResponseEntity.ok(
+                googleAuthService.login(request)
+        );
+    }
+
+
+    /**
+     * Complete Google Registration
+     *
+     * Used only after a new Google user
+     * provides their phone number.
+     */
+    @PostMapping("/google/complete")
+    public ResponseEntity<GoogleLoginResponse> completeGoogleRegistration(
+            @Valid @RequestBody GoogleLoginRequest request) {
+
+        return ResponseEntity.ok(
+                googleAuthService.completeRegistration(request)
+        );
     }
 
 }

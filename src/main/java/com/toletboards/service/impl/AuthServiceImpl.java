@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.toletboards.dto.AuthResponse;
 import com.toletboards.dto.LoginRequest;
 import com.toletboards.dto.RefreshTokenRequest;
@@ -16,6 +17,7 @@ import com.toletboards.model.User;
 import com.toletboards.repository.UserRepository;
 import com.toletboards.security.JwtService;
 import com.toletboards.service.AuthService;
+import com.toletboards.service.GoogleTokenService;
 import com.toletboards.service.RefreshTokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
     private final RefreshTokenService refreshTokenService;
+
+    private final GoogleTokenService googleTokenService;
 
     /**
      * REGISTER
@@ -154,5 +158,8 @@ public void logout(String email) {
     refreshTokenService.deleteByUser(user);
 
 }
+
+
+
 
 }

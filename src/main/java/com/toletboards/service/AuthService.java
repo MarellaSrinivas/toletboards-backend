@@ -13,6 +13,7 @@ public interface AuthService {
 
     AuthResponse refreshToken(RefreshTokenRequest request);
 
+ 
     void logout(String email);
 
 }
