@@ -30,11 +30,7 @@ public class GoogleAuthServiceImpl implements GoogleAuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-
-    // =========================================================
-    // GOOGLE LOGIN
-    // =========================================================
-
+    
     @Override
     public GoogleLoginResponse login(
             GoogleLoginRequest request) {

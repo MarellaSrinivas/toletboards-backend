@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.toletboards.dto.AuthResponse;
 import com.toletboards.dto.LoginRequest;
 import com.toletboards.dto.RefreshTokenRequest;
@@ -17,7 +16,6 @@ import com.toletboards.model.User;
 import com.toletboards.repository.UserRepository;
 import com.toletboards.security.JwtService;
 import com.toletboards.service.AuthService;
-import com.toletboards.service.GoogleTokenService;
 import com.toletboards.service.RefreshTokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,8 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final RefreshTokenService refreshTokenService;
 
-    private final GoogleTokenService googleTokenService;
-
+ 
     /**
      * REGISTER
      */
@@ -106,16 +103,34 @@ public class AuthServiceImpl implements AuthService {
 @Override
 public AuthResponse login(LoginRequest request) {
 
+    String identifier = request.getIdentifier().trim();
+
+    User user;
+
+    if (identifier.matches("\\d+")) {
+
+        // Phone login
+        user = userRepository.findByPhone(identifier)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid phone number or password"));
+
+    } else {
+
+        // Email login
+        user = userRepository.findByEmail(identifier)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid email or password"));
+    }
+
     authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                    request.getEmail(),
-                    request.getPassword()));
+                    user.getEmail(),
+                    request.getPassword()
+            )
+    );
 
-    User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() ->
-                    new RuntimeException("User not found"));
-
-    String accessToken = jwtService.generateAccessToken(user);
+    String accessToken =
+            jwtService.generateAccessToken(user);
 
     RefreshToken refreshToken =
             refreshTokenService.createRefreshToken(user);
@@ -123,8 +138,8 @@ public AuthResponse login(LoginRequest request) {
     return buildResponse(
             user,
             accessToken,
-            refreshToken.getToken());
-
+            refreshToken.getToken()
+    );
 }
 @Override
 public AuthResponse refreshToken(

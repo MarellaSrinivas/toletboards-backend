@@ -1,6 +1,4 @@
 package com.toletboards.dto;
-
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -11,9 +9,8 @@ import lombok.*;
 @Builder
 public class LoginRequest {
 
-    @Email(message = "Invalid email")
-    @NotBlank(message = "Email is required")
-    private String email;
+    @NotBlank(message = "Email or phone number is required")
+    private String identifier;
 
     @NotBlank(message = "Password is required")
     private String password;

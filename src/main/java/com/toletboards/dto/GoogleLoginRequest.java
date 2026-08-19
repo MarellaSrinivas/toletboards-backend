@@ -10,6 +10,6 @@ public class GoogleLoginRequest {
 
     @NotBlank
     private String credential;
-        private String phone;
+    private String phone;
 
 }

@@ -16,7 +16,6 @@ import com.toletboards.repository.PropertyVisitRepository;
 import com.toletboards.repository.UserRepository;
 import com.toletboards.service.PropertyImageService;
 import com.toletboards.service.PropertyService;
-import com.toletboards.model.PropertyApprovalStatus;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.UserDetails;
