@@ -6,7 +6,6 @@ import com.toletboards.dto.admin.AdminPropertyResponse;
 import com.toletboards.dto.admin.AdminUserStatsResponse;
 import com.toletboards.dto.admin.AdminVisitResponse;
 import com.toletboards.dto.admin.UserListResponse;
-import com.toletboards.model.PropertyApprovalStatus;
 import com.toletboards.service.AdminService;
 
 import lombok.RequiredArgsConstructor;

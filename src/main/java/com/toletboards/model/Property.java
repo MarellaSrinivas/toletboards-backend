@@ -114,6 +114,16 @@ public class Property {
      * Status
      */
 
+
+     @Column(name = "property_source")
+private String propertySource;
+
+@Column(name = "contact_name")
+private String contactName;
+
+@Column(name = "contact_mobile")
+private String contactMobile;
+
  @Enumerated(EnumType.STRING)
 @Builder.Default
 private PropertyApprovalStatus approvalStatus = PropertyApprovalStatus.PENDING;

@@ -40,6 +40,16 @@ public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyVisitRepository PropertyVisitRepository;
 
+    private boolean hasRole(UserDetails userDetails, String role) {
+    return userDetails.getAuthorities()
+            .stream()
+            .anyMatch(a ->
+                    a.getAuthority().equalsIgnoreCase(role)
+                    || a.getAuthority().equalsIgnoreCase("ROLE_" + role));
+}
+
+
+
     @Override
     public PropertyResponse createProperty(
             PropertyRequest request,
@@ -48,6 +58,8 @@ public class PropertyServiceImpl implements PropertyService {
 
         User owner = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+                
+
 
         Property property = Property.builder()
 

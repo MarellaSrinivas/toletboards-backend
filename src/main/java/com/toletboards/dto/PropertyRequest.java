@@ -6,28 +6,26 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class PropertyRequest {
-
+    public class PropertyRequest {
+    private String propertySource;   // OWNER / AGENT
+    private String contactName;
+    private String contactMobile;
     private String propertyType;
     private String propertyCategory;
     private String propertyName;
     private Double totalArea;
-
     private Integer bhk;
     private Integer bathrooms;
     private Integer floors;
     private Integer balconies;
     private String propertyAge;
-
     private BigDecimal monthlyRent;
     private BigDecimal securityDeposit;
     private BigDecimal maintenanceCharges;
     private String propertyStatus;
-
     private String preferredTenant;
     private String furnishingStatus;
     private String foodPreference;
-
     private Boolean petsAllowed;
     private Boolean smokingAllowed;
     private Boolean alcoholAllowed;
