@@ -40,7 +40,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     private final PropertyVisitRepository PropertyVisitRepository;
 
-    private boolean hasRole(UserDetails userDetails, String role) {
+   private boolean hasRole(UserDetails userDetails, String role) {
     return userDetails.getAuthorities()
             .stream()
             .anyMatch(a ->
@@ -50,97 +50,247 @@ public class PropertyServiceImpl implements PropertyService {
 
 
 
-    @Override
-    public PropertyResponse createProperty(
-            PropertyRequest request,
-            List<MultipartFile> images,
-            UserDetails userDetails) {
+   @Override
+public PropertyResponse createProperty(
+        PropertyRequest request,
+        List<MultipartFile> images,
+        UserDetails userDetails) {
 
-        User owner = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-                
+    User uploader = userRepository.findByEmail(userDetails.getUsername())
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
+    boolean isAdmin = hasRole(userDetails, "ADMIN");
+    boolean isAgent = hasRole(userDetails, "AGENT");
+    boolean isUser = hasRole(userDetails, "USER");
 
-        Property property = Property.builder()
+    /*
+     * =========================================================
+     * PROPERTY SOURCE
+     * =========================================================
+     */
 
-                // Owner
-                .owner(owner)
+    String propertySource;
 
-                // Basic
-                .propertyType(request.getPropertyType())
-                .propertyCategory(request.getPropertyCategory())
-                .propertyName(request.getPropertyName())
-                .totalArea(request.getTotalArea())
+    if (isAgent) {
 
-                // Configuration
-                .bhk(request.getBhk())
-                .bathrooms(request.getBathrooms())
-                .floors(request.getFloors())
-                .balconies(request.getBalconies())
-                .propertyAge(request.getPropertyAge())
+        // Agent can only upload agent properties
+        propertySource = "AGENT";
 
-                // Rental
-                .monthlyRent(request.getMonthlyRent())
-                .securityDeposit(request.getSecurityDeposit())
-                .maintenanceCharges(request.getMaintenanceCharges())
-                .propertyStatus(request.getPropertyStatus())
+    } else if (isAdmin) {
 
-                // Tenant
-                .preferredTenant(request.getPreferredTenant())
-                .furnishingStatus(request.getFurnishingStatus())
-                .foodPreference(request.getFoodPreference())
+        // Admin must explicitly select OWNER or AGENT
+        propertySource = request.getPropertySource();
 
-                .petsAllowed(request.getPetsAllowed())
-                .smokingAllowed(request.getSmokingAllowed())
-                .alcoholAllowed(request.getAlcoholAllowed())
+        if (!"OWNER".equalsIgnoreCase(propertySource)
+                && !"AGENT".equalsIgnoreCase(propertySource)) {
 
-                .availableImmediately(request.getAvailableImmediately())
-                .availableFrom(request.getAvailableFrom())
-
-                // Description
-                .description(request.getDescription())
-
-                // Address
-                .state(request.getState())
-                .city(request.getCity())
-                .address(request.getAddress())
-
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-
-                .googleMapLink(request.getGoogleMapLink())
-
-                .build();
-
-        property = propertyRepository.save(property);
-
-        List<UploadedImage> uploadedImages =
-                propertyImageService.uploadImages(images);
-
-        for (int i = 0; i < uploadedImages.size(); i++) {
-
-            UploadedImage image = uploadedImages.get(i);
-
-            PropertyImage propertyImage = PropertyImage.builder()
-
-                    .property(property)
-
-                    .fileName(image.getFileName())
-
-                    .storedFileName(image.getStoredFileName())
-
-                    .imageUrl(image.getImageUrl())
-
-                    .coverImage(i == 0)
-
-                    .build();
-
-            propertyImageRepository.save(propertyImage);
+            throw new RuntimeException(
+                    "Please select whether this is an Owner Property or Agent Property"
+            );
         }
 
-        return mapToResponse(property);
+    } else if (isUser) {
 
+        // Normal user is always treated as owner
+        propertySource = "OWNER";
+
+    } else {
+
+        throw new RuntimeException(
+                "You are not authorized to upload a property"
+        );
     }
+
+
+    /*
+     * =========================================================
+     * CONTACT DETAILS
+     * =========================================================
+     */
+
+    String contactName = request.getContactName();
+    String contactMobile = request.getContactMobile();
+
+    /*
+     * AGENT
+     *
+     * Agent must provide OWNER details.
+     */
+    if (isAgent) {
+
+        if (contactName == null
+                || contactName.trim().isEmpty()) {
+
+            throw new RuntimeException(
+                    "Owner name is required for agent property"
+            );
+        }
+
+        if (contactMobile == null
+                || !contactMobile.matches("\\d{10}")) {
+
+            throw new RuntimeException(
+                    "Valid 10 digit owner mobile number is required"
+            );
+        }
+    }
+
+
+    /*
+     * ADMIN
+     *
+     * OWNER PROPERTY -> Owner details
+     * AGENT PROPERTY -> Agent details
+     */
+    if (isAdmin) {
+
+        if (contactName == null
+                || contactName.trim().isEmpty()) {
+
+            throw new RuntimeException(
+                    "Contact name is required"
+            );
+        }
+
+        if (contactMobile == null
+                || !contactMobile.matches("\\d{10}")) {
+
+            throw new RuntimeException(
+                    "Valid 10 digit contact mobile number is required"
+            );
+        }
+    }
+
+
+    /*
+     * =========================================================
+     * AVAILABILITY
+     * =========================================================
+     *
+     * Vacant:
+     *   availableImmediately = false
+     *   availableFrom = null
+     *
+     * Occupied / Notice Period:
+     *   User can select Available Immediately
+     *   OR provide Available From date.
+     */
+
+    Boolean availableImmediately = false;
+    request.setAvailableFrom(null);
+
+    String propertyStatus = request.getPropertyStatus();
+
+    if ("Vacant".equalsIgnoreCase(propertyStatus)) {
+
+        availableImmediately = false;
+        request.setAvailableFrom(null);
+
+    } else if ("Occupied".equalsIgnoreCase(propertyStatus)
+            || "Notice Period".equalsIgnoreCase(propertyStatus)) {
+
+        availableImmediately =
+                Boolean.TRUE.equals(request.getAvailableImmediately());
+
+        if (availableImmediately) {
+            request.setAvailableFrom(null);
+        }
+    }
+
+
+    /*
+     * =========================================================
+     * BUILD PROPERTY
+     * =========================================================
+     */
+
+    Property property = Property.builder()
+
+            // Logged-in uploader
+            .owner(uploader)
+
+            // Property contact
+            .propertySource(propertySource)
+            .contactName(contactName)
+            .contactMobile(contactMobile)
+
+            // Basic
+            .propertyType(request.getPropertyType())
+            .propertyCategory(request.getPropertyCategory())
+            .propertyName(request.getPropertyName())
+            .totalArea(request.getTotalArea())
+
+            // Configuration
+            .bhk(request.getBhk())
+            .bathrooms(request.getBathrooms())
+            .floors(request.getFloors())
+            .balconies(request.getBalconies())
+            .propertyAge(request.getPropertyAge())
+
+            // Rental
+            .monthlyRent(request.getMonthlyRent())
+            .securityDeposit(request.getSecurityDeposit())
+            .maintenanceCharges(request.getMaintenanceCharges())
+            .propertyStatus(request.getPropertyStatus())
+
+            // Availability
+            .availableImmediately(availableImmediately)
+            .availableFrom(request.getAvailableFrom())
+
+            // Tenant preferences
+            .preferredTenant(request.getPreferredTenant())
+            .furnishingStatus(request.getFurnishingStatus())
+            .foodPreference(request.getFoodPreference())
+            .petsAllowed(request.getPetsAllowed())
+            .smokingAllowed(request.getSmokingAllowed())
+            .alcoholAllowed(request.getAlcoholAllowed())
+
+            // Description
+            .description(request.getDescription())
+
+            // Address
+            .state(request.getState())
+            .city(request.getCity())
+            .address(request.getAddress())
+
+            .latitude(request.getLatitude())
+            .longitude(request.getLongitude())
+
+            .googleMapLink(request.getGoogleMapLink())
+
+            .build();
+
+
+    property = propertyRepository.save(property);
+
+
+    /*
+     * =========================================================
+     * UPLOAD IMAGES
+     * =========================================================
+     */
+
+    List<UploadedImage> uploadedImages =
+            propertyImageService.uploadImages(images);
+
+    for (int i = 0; i < uploadedImages.size(); i++) {
+
+        UploadedImage image = uploadedImages.get(i);
+
+        PropertyImage propertyImage = PropertyImage.builder()
+                .property(property)
+                .fileName(image.getFileName())
+                .storedFileName(image.getStoredFileName())
+                .imageUrl(image.getImageUrl())
+                .coverImage(i == 0)
+                .build();
+
+        propertyImageRepository.save(propertyImage);
+    }
+
+
+    return mapToResponse(property);
+}
 
     @Override
     @Transactional(readOnly = true)

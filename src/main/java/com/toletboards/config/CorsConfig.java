@@ -14,8 +14,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "https://toletboards.com",
                         "https://www.toletboards.com",
                         "http://localhost:5173",
-                        "http://192.168.0.127:5173/",
-                        "http://192.168.0.127:8080/",
+                        "http://192.168.1.16:5173/",
+                        "http://192.168.1.16:8080/",
                         "http://localhost:8080/"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
