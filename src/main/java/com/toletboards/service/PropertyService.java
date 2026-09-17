@@ -30,6 +30,12 @@ public interface PropertyService {
     List<PropertyResponse> getPropertiesByCategory(String propertyCategory);
 
 
+    List<PropertyResponse> searchProperties(
+        String city,
+        String propertyType,
+        String priceRange
+);
+
     DashboardResponse getDashboard(UserDetails userDetails);
  
 

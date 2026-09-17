@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toletboards.dto.DashboardResponse;
 import com.toletboards.dto.PropertyRequest;
@@ -72,16 +73,37 @@ public class PropertyController {
     /**
      * Public Home Page
      */
-    @GetMapping
-    public ResponseEntity<List<PropertyResponse>> getAllProperties() {
+   @GetMapping
+public ResponseEntity<List<PropertyResponse>> getAllProperties(
+
+        @RequestParam(required = false, defaultValue = "")
+        String city,
+
+        @RequestParam(required = false, defaultValue = "")
+        String propertyType,
+
+        @RequestParam(required = false, defaultValue = "")
+        String priceRange
+
+) {
+
+    if (!city.isBlank()
+            || !propertyType.isBlank()
+            || !priceRange.isBlank()) {
 
         return ResponseEntity.ok(
-
-                propertyService.getAllProperties()
-
+                propertyService.searchProperties(
+                        city,
+                        propertyType,
+                        priceRange
+                )
         );
-
     }
+
+    return ResponseEntity.ok(
+            propertyService.getAllProperties()
+    );
+}
 
 
     @GetMapping("/category/{propertyCategory}")

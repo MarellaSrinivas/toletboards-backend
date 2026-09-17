@@ -1,5 +1,6 @@
 package com.toletboards.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -89,5 +90,29 @@ Page<Property> findByApprovalStatusAndPropertyCategoryIgnoreCase(
 
 
         
+List<Property> findByApprovalStatusAndCityIgnoreCaseAndPropertyTypeIgnoreCase(
+        PropertyApprovalStatus status,
+        String city,
+        String propertyType
+);
 
+List<Property> findByApprovalStatusAndCityIgnoreCase(
+        PropertyApprovalStatus status,
+        String city
+);
+
+List<Property> findByApprovalStatusAndPropertyTypeIgnoreCase(
+        PropertyApprovalStatus status,
+        String propertyType
+);
+
+List<Property> findByApprovalStatusAndMonthlyRentLessThanEqual(
+        PropertyApprovalStatus status,
+        BigDecimal monthlyRent
+);
+
+List<Property> findByApprovalStatusAndMonthlyRentGreaterThan(
+        PropertyApprovalStatus status,
+        BigDecimal monthlyRent
+);
 }

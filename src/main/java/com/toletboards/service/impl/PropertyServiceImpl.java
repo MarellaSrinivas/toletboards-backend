@@ -2,6 +2,7 @@
 
 package com.toletboards.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -467,6 +468,83 @@ public DashboardResponse getDashboard(UserDetails userDetails) {
                     PropertyVisitRepository.countByOwnerId(owner.getId()))
 
             .build();
+}
+
+
+@Override
+@Transactional(readOnly = true)
+public List<PropertyResponse> searchProperties(
+        String city,
+        String propertyType,
+        String priceRange) {
+
+    city = city == null ? "" : city.trim();
+    propertyType = propertyType == null ? "" : propertyType.trim();
+    priceRange = priceRange == null ? "" : priceRange.trim();
+
+    List<Property> properties;
+
+    if (!city.isEmpty() && !propertyType.isEmpty()) {
+
+        properties = propertyRepository
+                .findByApprovalStatusAndCityIgnoreCaseAndPropertyTypeIgnoreCase(
+                        PropertyApprovalStatus.APPROVED,
+                        city,
+                        propertyType
+                );
+
+    } else if (!city.isEmpty()) {
+
+        properties = propertyRepository
+                .findByApprovalStatusAndCityIgnoreCase(
+                        PropertyApprovalStatus.APPROVED,
+                        city
+                );
+
+    } else if (!propertyType.isEmpty()) {
+
+        properties = propertyRepository
+                .findByApprovalStatusAndPropertyTypeIgnoreCase(
+                        PropertyApprovalStatus.APPROVED,
+                        propertyType
+                );
+
+    } else {
+
+        properties = propertyRepository
+                .findByApprovalStatus(
+                        PropertyApprovalStatus.APPROVED
+                );
+    }
+
+    // Price filtering
+    if (!priceRange.isEmpty()) {
+
+        if ("10000".equals(priceRange)) {
+
+            properties = properties.stream()
+                    .filter(p ->
+                            p.getMonthlyRent() != null &&
+                            p.getMonthlyRent()
+                                    .compareTo(new BigDecimal("10000")) <= 0
+                    )
+                    .toList();
+
+        } else if ("20000".equals(priceRange)) {
+
+            properties = properties.stream()
+                    .filter(p ->
+                            p.getMonthlyRent() != null &&
+                            p.getMonthlyRent()
+                                    .compareTo(new BigDecimal("10000")) > 0
+                    )
+                    .toList();
+        }
+    }
+
+    return properties.stream()
+            .map(this::mapToResponse)
+            .toList();
 }
 
 }

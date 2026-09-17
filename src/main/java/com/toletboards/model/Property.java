@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "properties")
