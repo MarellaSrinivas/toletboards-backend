@@ -2,6 +2,13 @@
 
 package com.toletboards.service.impl;
 
+import java.util.List;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.toletboards.dto.DashboardResponse;
 import com.toletboards.dto.PropertyRequest;
 import com.toletboards.dto.PropertyResponse;
@@ -16,14 +23,8 @@ import com.toletboards.repository.PropertyVisitRepository;
 import com.toletboards.repository.UserRepository;
 import com.toletboards.service.PropertyImageService;
 import com.toletboards.service.PropertyService;
+
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -305,6 +306,23 @@ public PropertyResponse createProperty(
 
                 .toList();
     }
+
+    @Override
+@Transactional(readOnly = true)
+public List<PropertyResponse> getPropertiesByCategory(
+        String propertyCategory) {
+
+    return propertyRepository
+            .findByApprovalStatusAndPropertyCategoryIgnoreCase(
+                    PropertyApprovalStatus.APPROVED,
+                    propertyCategory)
+
+            .stream()
+
+            .map(this::mapToResponse)
+
+            .toList();
+}
 
     @Override
     @Transactional(readOnly = true)

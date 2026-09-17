@@ -26,6 +26,8 @@ public interface PropertyService {
     PropertyResponse getProperty(Long propertyId);
 
     List<PropertyResponse> getAllProperties();
+    
+    List<PropertyResponse> getPropertiesByCategory(String propertyCategory);
 
 
     DashboardResponse getDashboard(UserDetails userDetails);

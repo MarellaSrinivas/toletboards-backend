@@ -17,6 +17,10 @@ public interface PropertyRepository
     List<Property> findByOwner(User owner);
         List<Property> findByApprovalStatus(PropertyApprovalStatus status);
 
+        List<Property> findByApprovalStatusAndPropertyCategoryIgnoreCase(
+        PropertyApprovalStatus status,
+        String propertyCategory);
+
  
 
     long countByOwner(User owner);
@@ -77,5 +81,13 @@ long countByActiveTrue();
 long countByActiveFalse();
 
 void deleteByOwner(User owner);
+
+Page<Property> findByApprovalStatusAndPropertyCategoryIgnoreCase(
+        PropertyApprovalStatus status,
+        String propertyCategory,
+        Pageable pageable);
+
+
+        
 
 }
