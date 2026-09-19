@@ -385,8 +385,7 @@ public List<PropertyResponse> getPropertiesByCategory(
 
                 // Owner
                 .ownerId(property.getOwner().getId())
-                .ownerName(property.getOwner().getFullName())
-
+            .ownerName(property.getContactName())
                 // Basic
                 .propertyType(property.getPropertyType())
                 .propertyCategory(property.getPropertyCategory())
